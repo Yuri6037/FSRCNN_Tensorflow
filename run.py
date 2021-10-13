@@ -340,7 +340,7 @@ class run:
 
         graph = tf.get_default_graph()
         with graph.as_default():
-            with tf.Session(config=self.config) as sess:
+            with tf.Session(graph=graph) as sess:
                 
                 ### Restore checkpoint
                 ckpt_name = self.ckpt_path + "fsrcnn_ckpt" + ".meta"
