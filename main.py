@@ -1,17 +1,27 @@
 import tensorflow as tf 
-import fsrcnn
 import data_utils
 import run
 import os
-import cv2
-import numpy as np
-import pathlib
 import argparse
-from PIL import Image
-import numpy
-from tensorflow.python.client import device_lib
+import sys
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' #gets rid of avx/fma warning
+
+#Inject our custom file logger
+class Logger(object):
+    def __init__(self):
+        self.terminal = sys.stdout
+        self.log = open("logfile.log", "a")
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        pass
+
+sys.stdout = Logger()
+#End
 
 # TODO: 
 # Overlapping patches

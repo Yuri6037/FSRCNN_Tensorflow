@@ -4,9 +4,7 @@ import cv2
 import numpy as np
 import math
 import data_utils
-from skimage import io
 import fsrcnn
-from PIL import Image
 
 from tensorflow.python.tools import freeze_graph
 from tensorflow.python.tools import optimize_for_inference_lib
