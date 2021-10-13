@@ -32,6 +32,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--train', help='Train the model', action="store_true")
     parser.add_argument('--test', help='Run tests on the model', action="store_true")
+    parser.add_argument('--upscale', help='Upscale single image', action="store_true")
     parser.add_argument('--export', help='Export the model as .pb', action="store_true")
     parser.add_argument('--fromscratch', help='Load previous model for training',action="store_false")
     parser.add_argument('--finetune', help='Finetune model on General100 dataset',action="store_true")
@@ -112,6 +113,9 @@ if __name__ == "__main__":
         run.testFromPb(args.image)
         #run.test(args.image)
         #run.upscale(args.image)
+
+    if args.upscale:
+        run.upscaleFromPb(args.image)
 
     if args.export:
         run.export()

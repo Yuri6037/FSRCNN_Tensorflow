@@ -285,7 +285,52 @@ class run:
             cv2.destroyAllWindows()
 
         sess.close()
-    
+
+    def upscaleFromPb(self, path):
+        print("Loading PB...")
+        # Read model
+        pbPath = "./models/FSRCNN_x{}.pb".format(self.scale)
+        if self.smallFlag:
+            pbPath = "./models/FSRCNN-small_x{}.pb".format(self.scale)
+        # Get graph
+        graph = self.load_pb(pbPath)
+        LR_tensor = graph.get_tensor_by_name("IteratorGetNext:0")
+        HR_tensor = graph.get_tensor_by_name("NHWC_output:0")
+        print("Done!")
+
+        name = os.path.basename(path)
+        img = cv2.imread(path, 3)
+        img_ycc = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
+        img_y = img_ycc[:, :, 0]
+        floatimg = img_y.astype(np.float32) / 255.0
+        LR_input_ = floatimg.reshape(1, floatimg.shape[0], floatimg.shape[1], 1)
+
+        with tf.Session(config=self.config) as sess:
+            print("Upscaling single image by a factor of {}:\n".format(self.scale))
+
+            output = sess.run(HR_tensor, feed_dict={LR_tensor: LR_input_})
+
+            # post-process
+            Y = output[0]
+            Y = (Y * 255.0).clip(min=0, max=255)
+            Y = (Y).astype(np.uint8)
+
+            # Merge with Chrominance channels Cr/Cb
+            Cr = np.expand_dims(
+                cv2.resize(img_ycc[:, :, 1], None, fx=self.scale, fy=self.scale, interpolation=cv2.INTER_CUBIC), axis=2)
+            Cb = np.expand_dims(
+                cv2.resize(img_ycc[:, :, 2], None, fx=self.scale, fy=self.scale, interpolation=cv2.INTER_CUBIC), axis=2)
+            HR_image = (cv2.cvtColor(np.concatenate((Y, Cr, Cb), axis=2), cv2.COLOR_YCrCb2BGR))
+
+            bicubic_image = cv2.resize(img, None, fx=self.scale, fy=self.scale, interpolation=cv2.INTER_CUBIC)
+
+            cv2.imwrite("./result/bicubic/" + name, bicubic_image)
+            cv2.imwrite("./result/fsrcnn/" + name, HR_image)
+
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+        sess.close()
+
     def export(self):
 
         if not os.path.exists("./models"):
