@@ -305,7 +305,7 @@ class run:
         floatimg = img_y.astype(np.float32) / 255.0
         LR_input_ = floatimg.reshape(1, floatimg.shape[0], floatimg.shape[1], 1)
 
-        with tf.Session(config=self.config) as sess:
+        with tf.Session(graph=graph) as sess:
             print("Upscaling single image by a factor of {}:\n".format(self.scale))
 
             output = sess.run(HR_tensor, feed_dict={LR_tensor: LR_input_})
@@ -340,7 +340,7 @@ class run:
 
         graph = tf.get_default_graph()
         with graph.as_default():
-            with tf.Session(graph=graph) as sess:
+            with tf.Session(config=self.config) as sess:
                 
                 ### Restore checkpoint
                 ckpt_name = self.ckpt_path + "fsrcnn_ckpt" + ".meta"
