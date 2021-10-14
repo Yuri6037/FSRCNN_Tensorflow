@@ -138,13 +138,13 @@ def augment_image(img):
     """
     augmented_images = []
 
-    rotated_images = rotate(img)
+    #rotated_images = rotate(img)
     
-    for img in rotated_images:
-        downscaled_images = downscale(img)
-        
-        for im in downscaled_images:
-            augmented_images.append(im)
+    #for img in rotated_images:
+    downscaled_images = downscale(img)
+
+    for im in downscaled_images:
+        augmented_images.append(im)
 
     return augmented_images
 
