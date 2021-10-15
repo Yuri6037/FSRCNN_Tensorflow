@@ -37,6 +37,7 @@ if __name__ == "__main__":
     parser.add_argument('--fromscratch', help='Load previous model for training',action="store_false")
     parser.add_argument('--finetune', help='Finetune model on General100 dataset',action="store_true")
     parser.add_argument('--small', help='Run FSRCNN-small', action="store_true")
+    parser.add_argument('--noaugment', help='Disable dataset augmentation', action="store_true")
     
     parser.add_argument('--scale', type=int, help='Scaling factor of the model', default=2)
     parser.add_argument('--batch', type=int, help='Batch size of the training', default=1)
@@ -104,10 +105,14 @@ if __name__ == "__main__":
             traindir = args.finetunedir
             augmented_path = "./augmented_general100"
 
-        # augment (if not done before) and then load images 
-        data_utils.augment(traindir, save_path=augmented_path)
+        # augment (if not done before) and then load images
+        if not(args.noaugment):
+            data_utils.augment(traindir, save_path=augmented_path)
 
-        run.train(augmented_path)
+        if (args.noaugment):
+            run.train(traindir)
+        else:
+            run.train(augmented_path)
 
     if args.test:
         run.testFromPb(args.image)
